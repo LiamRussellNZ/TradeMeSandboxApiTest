@@ -1,4 +1,4 @@
-.pytest_cache
-__pycache__
-assets
-report.html
+**/.pytest_cache
+**/__pycache__
+**/assets
+*.html
