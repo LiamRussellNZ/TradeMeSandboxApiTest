@@ -1,52 +1,62 @@
-try:
-	import os
-	import requests
+import requests
+import configparser
 
-	url= 'https://api.tmsandbox.co.nz/v1/Categories/6327/Details.json?catalogue=false'
+Config=configparser.ConfigParser()
+Config.read('config.ini')
+
+def ConfigSectionMap(section):
+    configDict = {}
+    options = Config.options(section)
+    for option in options:
+        try:
+            configDict[option] = Config.get(section, option)
+        except:
+            print("exception on %s!" % option)
+    return configDict
+
+criteria=ConfigSectionMap('Acceptance Criteria')
+endpointDict=ConfigSectionMap('Endpoint')
 
 
-	def endpoint_setup():
-		response=requests.get(url)
-		return response
+nameCheck=criteria['name']
+promotionGalleryText=criteria['gallerydescriptiontext']
+canRelistValue=bool(criteria['canrelist'])
 
-	api=endpoint_setup()
-	data=api.json()
+endpoint=endpointDict['api']
 
-	endpointResponse=endpoint_setup().status_code
-	nameCheck='Carbon credits'
+def endpoint_setup():
+    response=requests.get(endpoint)
+    return response
 
-	Promotions_Data= data['Promotions']
+api=endpoint_setup()
+data=api.json()
 
-	#Promotions has element with Name = "Gallery" has a Description that contains the text "2x larger image"
-	promotionGalleryText='2x larger image'
+endpointResponse=endpoint_setup().status_code
 
-	canRelistValue=True
+Promotions_Data= data['Promotions']
 
-	def Promotions_test(Phrase):
-		print('Testing if the promotions element with Name = "Gallery" has a description that contains the text "'+Phrase)
-		for element in Promotions_Data:		
-			for k in element.values():
-				if k =='Gallery':
-					elementDescription=element['Description']
-					if Phrase in elementDescription:
-						return True
-					else:
-						return False
+def Promotions_test(Phrase):
+    print('Testing if the promotions element with Name = "Gallery" has a description that contains the text "'+Phrase)
+    for element in Promotions_Data:		
+        for k in element.values():
+            if k =='Gallery':
+                elementDescription=element['Description']
+                if Phrase in elementDescription:
+                    return True
+                else:
+                    return False
 
-	def test_endpointReachableSends200():
-		assert endpointResponse==200
-		print('Endpoint returns '+str(endpointResponse))
+def test_endpointReachableSends200():
+        assert endpointResponse==200
+        print('Endpoint returns '+str(endpointResponse))
 
-	def test_name():
-		print('Testing if name is equal to '+nameCheck)
-		assert data['Name']==nameCheck
+def test_name():
+        print('Testing if name is equal to '+nameCheck)
+        assert data['Name']==nameCheck
 
-	def test_canRelist():
-		print('Testing if CanRelist element is set to '+str(canRelistValue))
-		assert data['CanRelist']==canRelistValue
+def test_canRelist():
+        print('Testing if CanRelist element is set to '+str(canRelistValue))
+        assert data['CanRelist']==canRelistValue
 
-	def test_promotionsDescription():
-		assert Promotions_test(promotionGalleryText)==True 
-
-except:
-	print("Some went wrong")
+def test_promotionsDescription():
+        assert Promotions_test(promotionGalleryText)==True 
