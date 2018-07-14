@@ -20,7 +20,7 @@ endpointDict=ConfigSectionMap('Endpoint')
 
 nameCheck=criteria['name']
 promotionGalleryText=criteria['gallerydescriptiontext']
-canRelistValue=bool(criteria['canrelist'])
+canRelistValue=Config.getboolean('Acceptance Criteria','canrelist')
 
 endpoint=endpointDict['api']
 
